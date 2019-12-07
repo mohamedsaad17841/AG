@@ -53,7 +53,9 @@ public class AG {
    // static ArrayList<pair> basedOnArrival = new ArrayList<pair>();
     static ArrayList<Process> processes = new ArrayList<>();
     static Queue<pair> queue = new LinkedList<>();
+    static ArrayList<pair<Process, Integer>> output = new ArrayList<>();
     static ArrayList<ArrayList<Integer>> quantumHistory = new ArrayList<>();
+    static ArrayList<Process> dieList = new ArrayList<>();
     AG()
     {
         numOfProcesses = 0;
@@ -136,22 +138,21 @@ public class AG {
         quantum = cin.nextInt();
 
         int totalSim = 0;
+        System.out.println("Enter the information of the processes");
         for(int i = 0 ; i<numOfProcesses ; i++)
         {
+            System.out.println(numOfProcesses);
             Scanner in = new Scanner(System.in);
             Process p = new Process();
-            System.out.println("Enter the information of the process");
 
             String name = in.nextLine();           p.name = name;
-            String color = in.nextLine();           p.color = color;
-            int arrival = in.nextInt();                p.arrivalTime = arrival;
+           // String color = in.nextLine();           p.color = color;
             int burst = in.nextInt();               p.burstTime = burst;    totalSim += burst;
+            int arrival = in.nextInt();                p.arrivalTime = arrival;
             int priority = in.nextInt();               p.priority = priority;
-            int quantum = in.nextInt();               p.processQuantum = quantum;
-            int idx = in.nextInt();                 p.index = i;
+            p.processQuantum = quantum;
+            p.index = i+1;
             p._AG = p.priority + p.arrivalTime + p.burstTime;
-           // pair temp = new pair(p, p.arrivalTime);
-           // basedOnArrival.add(temp);
             processes.add(p);
             pair<Process, Integer> temp2 = new pair(p, 1);
             queue.add(temp2);     //Add this process to queue;
@@ -166,8 +167,18 @@ public class AG {
             quantumHistory.add(temp);
             time++;
             runningProcess.burstTime--;
-            if(runningProcess.burstTime == 0)
+            if(output.size() == 0 || runningProcess.name != output.get(output.size() - 1).first.name)       //Add the process to the output whenever it's Enter or if this is the first process in the simularion
             {
+                pair<Process, Integer> temp0 = new pair(runningProcess, i);
+                output.add(temp0);
+            }
+            if(i == totalSim-1)
+            {
+                break;                  //if this is the last second, no need to check for the 3 below cases
+            }
+            if(runningProcess.burstTime == 0)                                                                    //case 3 : The process finished it's job
+            {
+                dieList.add(runningProcess);
                 runningProcess = nextProcess(queue, i);
             }
             else if(time >= runningProcess.processQuantum  && time >= processes.get(index).arrivalTime)          //case 1 : The process used all it's quantum
@@ -192,8 +203,29 @@ public class AG {
                 index = runningProcess.index;
             }
         }
+        for(pair<Process, Integer> p : output)
+        {
+            System.out.println(p.first.name + p.second);
+        }
     }
 
 }
 
-//Where I poll the queue
+/*
+p1
+17
+0
+4
+p2
+6
+3
+9
+p3
+10
+4
+3
+p4
+4
+29
+8
+*/
